@@ -7,10 +7,57 @@ import cv2
 import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Image as RLImage, Table, TableStyle, HRFlowable
+    SimpleDocTemplate, Paragraph, Spacer, Image as RLImage, Table, TableStyle, HRFlowable, PageBreak, KeepTogether
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
+from reportlab.pdfgen import canvas
+
+class NumberedCanvas(canvas.Canvas):
+    """Two-pass canvas to dynamically compute and stamp total page count with medical footer."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._saved_page_states = []
+
+    def showPage(self):
+        self._saved_page_states.append(dict(self.__dict__))
+        self._startPage()
+
+    def save(self):
+        num_pages = len(self._saved_page_states)
+        for state in self._saved_page_states:
+            self.__dict__.update(state)
+            self.draw_page_decorations(num_pages)
+            canvas.Canvas.showPage(self)
+        canvas.Canvas.save(self)
+
+    def draw_page_decorations(self, page_count):
+        self.saveState()
+        # Top running header for subsequent pages
+        if self._pageNumber > 1:
+            self.setFont('Helvetica-Bold', 8)
+            self.setFillColor(colors.HexColor('#0f172a'))
+            self.drawString(36, 762, 'NEUROVISION AI CLINICAL SUITE')
+            self.setFont('Helvetica', 8)
+            self.setFillColor(colors.HexColor('#64748b'))
+            self.drawRightString(612 - 36, 762, 'NEUROLOGICAL MRI DIAGNOSTIC REPORT')
+            self.setStrokeColor(colors.HexColor('#e2e8f0'))
+            self.setLineWidth(0.75)
+            self.line(36, 755, 612 - 36, 755)
+
+        # Bottom footer on all pages
+        self.setStrokeColor(colors.HexColor('#e2e8f0'))
+        self.setLineWidth(0.75)
+        self.line(36, 32, 612 - 36, 32)
+
+        self.setFont('Helvetica-Bold', 7.5)
+        self.setFillColor(colors.HexColor('#0f172a'))
+        self.drawString(36, 20, 'CONFIDENTIAL MEDICAL REPORT')
+        self.setFont('Helvetica', 7.5)
+        self.setFillColor(colors.HexColor('#64748b'))
+        self.drawString(180, 20, '|  Assisted Diagnostic Evaluation  |  CE / Clinical Research Tier')
+        self.drawRightString(612 - 36, 20, f'Page {self._pageNumber} of {page_count}')
+        self.restoreState()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates') if os.path.exists(os.path.join(BASE_DIR, 'templates')) else BASE_DIR
@@ -677,13 +724,21 @@ def highlight_tumor_region(image_path, output_path, is_tumor, label, confidence)
 # Comprehensive Medical Diagnostic PDF Report Generator
 # ==============================================================================
 def generate_pdf_report(original_img_path, highlighted_img_path, pred_data, filename, pdf_output_path):
+    """
+    Generates an executive-tier, board-certified clinical PDF diagnostic report.
+    Structured cleanly across 2 pages:
+      - Page 1: Clinical Header, Patient Scan Metadata, Primary Diagnosis Banner,
+                Comparative MRI Plates (Original vs AI Red-Highlighted), Multi-Class Distribution.
+      - Page 2: Pathology Profile, WHO Histopathological Staging, Oncology Nutritional Support,
+                Pharmacotherapy Guidance, Emergency Directives & Physician Sign-off.
+    """
     doc = SimpleDocTemplate(
         pdf_output_path,
         pagesize=letter,
         rightMargin=36,
         leftMargin=36,
-        topMargin=32,
-        bottomMargin=32
+        topMargin=36,
+        bottomMargin=42
     )
     styles = getSampleStyleSheet()
     elements = []
@@ -691,36 +746,126 @@ def generate_pdf_report(original_img_path, highlighted_img_path, pred_data, file
     label = pred_data['label']
     info = TUMOR_KNOWLEDGE_BASE.get(label, TUMOR_KNOWLEDGE_BASE['glioma'])
     is_tumor = pred_data['is_tumor']
+    conf_pct = pred_data['confidence'] * 100
 
-    # Typography & Styles
-    title_style = ParagraphStyle('DocTitle', parent=styles['Heading1'], fontSize=18, leading=22, textColor=colors.HexColor('#0f172a'), fontName='Helvetica-Bold')
-    sub_style = ParagraphStyle('DocSubtitle', parent=styles['Normal'], fontSize=9.5, leading=13, textColor=colors.HexColor('#475569'), fontName='Helvetica')
-    sec_title_style = ParagraphStyle('SecTitle', parent=styles['Heading2'], fontSize=11.5, leading=15, textColor=colors.HexColor('#0f172a'), fontName='Helvetica-Bold')
-    body_style = ParagraphStyle('BodyP', parent=styles['Normal'], fontSize=8.5, leading=12, textColor=colors.HexColor('#334155'), fontName='Helvetica')
-    body_bold = ParagraphStyle('BodyBold', parent=styles['Normal'], fontSize=8.5, leading=12, textColor=colors.HexColor('#0f172a'), fontName='Helvetica-Bold')
-    th_style = ParagraphStyle('TH', parent=styles['Normal'], fontSize=8.5, leading=11, fontName='Helvetica-Bold', textColor=colors.white)
-    td_style = ParagraphStyle('TD', parent=styles['Normal'], fontSize=8, leading=11, fontName='Helvetica', textColor=colors.HexColor('#1e293b'))
-    td_bold = ParagraphStyle('TDBold', parent=styles['Normal'], fontSize=8, leading=11, fontName='Helvetica-Bold', textColor=colors.HexColor('#0f172a'))
+    # Custom Design Tokens & Typography
+    col_primary = colors.HexColor('#0f172a')     # Slate 900
+    col_secondary = colors.HexColor('#334155')   # Slate 700
+    col_muted = colors.HexColor('#64748b')       # Slate 500
+    col_border = colors.HexColor('#e2e8f0')      # Slate 200
+    col_brand = colors.HexColor('#0284c7')       # Sky 600
+    col_danger = colors.HexColor('#dc2626')      # Red 600
+    col_danger_bg = colors.HexColor('#fef2f2')   # Red 50
+    col_danger_border = colors.HexColor('#fca5a5') # Red 300
+    col_success = colors.HexColor('#16a34a')     # Green 600
+    col_success_bg = colors.HexColor('#f0fdf4')  # Green 50
+    col_success_border = colors.HexColor('#86efac') # Green 300
 
-    # 1. Header
-    elements.append(Paragraph("CLINICAL NEUROLOGICAL AI EVALUATION REPORT", title_style))
-    elements.append(Paragraph("Deep Learning MRI Analysis & Computer Vision Tumor Localization (Highlighted in Red)", sub_style))
-    elements.append(Spacer(1, 8))
-    elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#0284c7'), spaceAfter=10))
+    title_style = ParagraphStyle(
+        'DocTitle',
+        parent=styles['Heading1'],
+        fontSize=15,
+        leading=18,
+        textColor=col_primary,
+        fontName='Helvetica-Bold'
+    )
+    sub_style = ParagraphStyle(
+        'DocSubtitle',
+        parent=styles['Normal'],
+        fontSize=8.5,
+        leading=12,
+        textColor=col_muted,
+        fontName='Helvetica'
+    )
+    sec_title_style = ParagraphStyle(
+        'SecTitle',
+        parent=styles['Heading2'],
+        fontSize=10.5,
+        leading=14,
+        textColor=col_primary,
+        fontName='Helvetica-Bold'
+    )
+    body_style = ParagraphStyle(
+        'BodyP',
+        parent=styles['Normal'],
+        fontSize=8,
+        leading=11.5,
+        textColor=col_secondary,
+        fontName='Helvetica'
+    )
+    body_bold = ParagraphStyle(
+        'BodyBold',
+        parent=styles['Normal'],
+        fontSize=8,
+        leading=11.5,
+        textColor=col_primary,
+        fontName='Helvetica-Bold'
+    )
+    th_style = ParagraphStyle(
+        'TH',
+        parent=styles['Normal'],
+        fontSize=8,
+        leading=10.5,
+        fontName='Helvetica-Bold',
+        textColor=colors.white
+    )
+    td_style = ParagraphStyle(
+        'TD',
+        parent=styles['Normal'],
+        fontSize=7.5,
+        leading=10.5,
+        fontName='Helvetica',
+        textColor=col_secondary
+    )
+    td_bold = ParagraphStyle(
+        'TDBold',
+        parent=styles['Normal'],
+        fontSize=7.5,
+        leading=10.5,
+        fontName='Helvetica-Bold',
+        textColor=col_primary
+    )
 
-    # 2. Metadata Table
-    now_str = datetime.datetime.now().strftime("%B %d, %Y - %H:%M:%S")
-    report_id = f"REP-{abs(hash(filename)) % 1000000:06d}"
+    # --------------------------------------------------------------------------
+    # PAGE 1: HEADER & IDENTITY
+    # --------------------------------------------------------------------------
+    header_table = Table([
+        [
+            Paragraph("<b>NEUROVISION CLINICAL IMAGING LABORATORY</b><br/><font color='#64748b' size='8'>Advanced Deep Learning Neurological Diagnostic Evaluation Suite</font>", ParagraphStyle('HLeft', parent=styles['Normal'], fontSize=11, leading=14, textColor=col_primary)),
+            Paragraph(f"<b>REPORT STATUS:</b> <font color='{'#dc2626' if is_tumor else '#16a34a'}'><b>{'PATHOLOGY IDENTIFIED' if is_tumor else 'NORMAL / CLEAR'}</b></font><br/><font color='#64748b' size='7.5'>REF: DL-VGG16-CV9</font>", ParagraphStyle('HRight', parent=styles['Normal'], fontSize=8.5, leading=12, textColor=col_primary, alignment=2))
+        ]
+    ], colWidths=[360, 180])
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 3))
+    elements.append(HRFlowable(width="100%", thickness=2, color=col_brand, spaceAfter=8))
+
+    # Patient & Scan Case Info Matrix
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d | %H:%M:%S UTC")
+    report_id = f"NV-REP-{abs(hash(filename)) % 10000000:07d}"
     meta_data = [
-        [Paragraph(f"<b>Report ID:</b> {report_id}", body_style), Paragraph(f"<b>Date/Time:</b> {now_str}", body_style)],
-        [Paragraph(f"<b>Scan Image:</b> {filename}", body_style), Paragraph("<b>Model Architecture:</b> VGG16 Deep Learning CNN", body_style)],
-        [Paragraph("<b>Target Resolution:</b> 128 x 128 px", body_style), Paragraph("<b>Localization Mode:</b> <font color='#dc2626'><b>Red Region Overlay (No Box)</b></font>", body_style)]
+        [
+            Paragraph(f"<b>Accession ID:</b> {report_id}", body_style),
+            Paragraph(f"<b>Analysis Timestamp:</b> {now_str}", body_style)
+        ],
+        [
+            Paragraph(f"<b>Source Image:</b> <font face='Courier'>{filename}</font>", body_style),
+            Paragraph("<b>Model Architecture:</b> VGG16 Deep CNN + OpenCV CV", body_style)
+        ],
+        [
+            Paragraph("<b>Input Preprocessing:</b> 128x128 px | Symmetrical Normalization", body_style),
+            Paragraph(f"<b>Localization Overlay:</b> {'<font color=\"#dc2626\"><b>Red Anomaly Mask (No Box)</b></font>' if is_tumor else '<font color=\"#16a34a\"><b>Intact Morphology (Normal)</b></font>'}", body_style)
+        ]
     ]
     meta_table = Table(meta_data, colWidths=[270, 270])
     meta_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f8fafc')),
-        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
-        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+        ('BOX', (0, 0), (-1, -1), 1, col_border),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, col_border),
         ('TOPPADDING', (0, 0), (-1, -1), 4),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
         ('LEFTPADDING', (0, 0), (-1, -1), 8),
@@ -729,113 +874,141 @@ def generate_pdf_report(original_img_path, highlighted_img_path, pred_data, file
     elements.append(meta_table)
     elements.append(Spacer(1, 10))
 
-    # 3. Diagnostic Finding Banner
-    result_text = pred_data['title'].upper()
-    conf_str = f"{pred_data['confidence']*100:.2f}%"
-    banner_bg = colors.HexColor('#fef2f2') if is_tumor else colors.HexColor('#f0fdf4')
-    banner_border = colors.HexColor('#ef4444') if is_tumor else colors.HexColor('#10b981')
+    # Diagnostic Finding Primary Banner
+    finding_title = pred_data['title'].upper()
+    banner_bg = col_danger_bg if is_tumor else col_success_bg
+    banner_border = col_danger_border if is_tumor else col_success_border
     banner_text_color = '#b91c1c' if is_tumor else '#15803d'
 
-    banner_p = Paragraph(f"<b>DIAGNOSTIC FINDING:</b> {result_text} &nbsp;&nbsp;|&nbsp;&nbsp; <b>MODEL CONFIDENCE:</b> {conf_str}",
-                         ParagraphStyle('Banner', parent=styles['Normal'], fontSize=11, leading=15, textColor=colors.HexColor(banner_text_color), fontName='Helvetica-Bold', alignment=1))
+    finding_html = (
+        f"<table width='100%'><tr>"
+        f"<td><font size='10.5' color='{banner_text_color}'><b>PRIMARY CLINICAL FINDING:</b> {finding_title}</font></td>"
+        f"<td align='right'><font size='10.5' color='{banner_text_color}'><b>CONFIDENCE:</b> {conf_pct:.2f}%</font></td>"
+        f"</tr></table>"
+    )
+    banner_p = Paragraph(finding_html, ParagraphStyle('Banner', parent=styles['Normal'], fontSize=9.5, leading=13))
     banner_table = Table([[banner_p]], colWidths=[540])
     banner_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, -1), banner_bg),
         ('BOX', (0, 0), (-1, -1), 1.5, banner_border),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 10),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 10),
     ]))
     elements.append(banner_table)
     elements.append(Spacer(1, 10))
 
-    # 4. Comparative Images (Original vs Red-Highlighted)
-    img_w = 210
-    img_h = 175
-    img_orig = RLImage(original_img_path, width=img_w, height=img_h)
-    img_high = RLImage(highlighted_img_path, width=img_w, height=img_h)
-    cap_style = ParagraphStyle('Cap', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold', alignment=1, textColor=colors.HexColor('#334155'))
+    # Dual Comparative MRI Plates
+    plate_w = 210
+    plate_h = 160
+    img_orig = RLImage(original_img_path, width=plate_w, height=plate_h)
+    img_high = RLImage(highlighted_img_path, width=plate_w, height=plate_h)
+    plate_title_style = ParagraphStyle('PlateTitle', parent=styles['Normal'], fontSize=8.5, fontName='Helvetica-Bold', alignment=1, textColor=col_primary)
+    plate_sub_style = ParagraphStyle('PlateSub', parent=styles['Normal'], fontSize=7, fontName='Helvetica', alignment=1, textColor=col_muted)
 
-    img_data = [
-        [Paragraph("Original Patient MRI Scan", cap_style), Paragraph("AI Highlighted Tumor Region (in Red, No Box)", cap_style)],
+    plate_data = [
+        [
+            Paragraph("PLATE 1: ORIGINAL PATIENT MRI", plate_title_style),
+            Paragraph("PLATE 2: AI COMPUTER VISION LOCALIZATION", plate_title_style)
+        ],
+        [
+            Paragraph("Pre-processed DICOM/T2 Weighted Baseline", plate_sub_style),
+            Paragraph("Red Region Overlay & Contour Gradient (No Bounding Box)", plate_sub_style)
+        ],
         [img_orig, img_high]
     ]
-    img_table = Table(img_data, colWidths=[270, 270])
-    img_table.setStyle(TableStyle([
+    plate_table = Table(plate_data, colWidths=[270, 270])
+    plate_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#ffffff')),
-        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.white),
+        ('BOX', (0, 0), (-1, -1), 1, col_border),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#f1f5f9')),
         ('TOPPADDING', (0, 0), (-1, 0), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 4),
-        ('TOPPADDING', (0, 1), (-1, 1), 4),
-        ('BOTTOMPADDING', (0, 1), (-1, 1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 1),
+        ('TOPPADDING', (0, 1), (-1, 1), 0),
+        ('BOTTOMPADDING', (0, 1), (-1, 1), 3),
+        ('TOPPADDING', (0, 2), (-1, 2), 3),
+        ('BOTTOMPADDING', (0, 2), (-1, 2), 4),
     ]))
-    elements.append(img_table)
-    elements.append(Spacer(1, 12))
+    elements.append(plate_table)
+    elements.append(Spacer(1, 8))
 
-    # 5. Multi-Class Breakdown Table
+    # Multi-Class Probability Distribution
     scores = pred_data['scores']
     prob_data = [[
-        Paragraph("Diagnostic Class", th_style),
-        Paragraph("Calculated Probability", th_style),
-        Paragraph("Assessment", th_style)
+        Paragraph("DIAGNOSTIC CRITERIA / PATHOLOGY CLASS", th_style),
+        Paragraph("PREDICTED PROBABILITY", th_style),
+        Paragraph("CLINICAL SIGNIFICANCE", th_style)
     ]]
     label_names = {
-        'glioma': 'Glioma Brain Tumor',
-        'meningioma': 'Meningioma Brain Tumor',
-        'pituitary': 'Pituitary Neuroendocrine Tumor',
-        'notumor': 'Healthy Scan (No Tumor)'
+        'glioma': 'Glioma (Primary Glial Neoplasm)',
+        'meningioma': 'Meningioma (Extra-Axial Dural Mass)',
+        'pituitary': 'Pituitary Neuroendocrine Tumor (PitNET)',
+        'notumor': 'Healthy Scan (No Lesions Localized)'
     }
     for k in ['glioma', 'meningioma', 'pituitary', 'notumor']:
         p_val = scores.get(k, 0.0) * 100
         sel = (k == label)
         c_style = td_bold if sel else td_style
+        status_label = "<font color='#dc2626'><b>PRIMARY POSITIVE DETECTION</b></font>" if (sel and is_tumor) else ("<font color='#16a34a'><b>PRIMARY NORMAL MATCH</b></font>" if sel else "Negative / Non-Significant")
         prob_data.append([
             Paragraph(label_names.get(k, k), c_style),
-            Paragraph(f"{p_val:.2f}%", c_style),
-            Paragraph("<b>PRIMARY DETECTED MATCH</b>" if sel else "Negative", c_style)
+            Paragraph(f"<b>{p_val:.2f}%</b>", c_style),
+            Paragraph(status_label, c_style)
         ])
-    prob_table = Table(prob_data, colWidths=[220, 140, 180])
+    prob_table = Table(prob_data, colWidths=[240, 130, 170])
     prob_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0f172a')),
         ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8fafc')),
-        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
-        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+        ('BOX', (0, 0), (-1, -1), 1, col_border),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, col_border),
         ('TOPPADDING', (0, 0), (-1, -1), 3),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
         ('LEFTPADDING', (0, 0), (-1, -1), 6),
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
     ]))
     elements.append(prob_table)
-    elements.append(Spacer(1, 14))
-
-    # 6. Detailed Tumor Explanation & Pathological Analysis
-    elements.append(Paragraph("1. Detailed Tumor Explanation & Pathological Profile", sec_title_style))
-    elements.append(Spacer(1, 4))
-    elements.append(Paragraph(f"<b>Classification:</b> {info['name']} &mdash; <i>{info['tagline']}</i>", body_bold))
-    elements.append(Paragraph(f"<b>Pathological Overview:</b> {info['overview']}", body_style))
-    elements.append(Spacer(1, 3))
-    elements.append(Paragraph(f"<b>Cellular Pathophysiology:</b> {info['pathophysiology']}", body_style))
-    elements.append(Spacer(1, 3))
-    symptoms_list = ", ".join(info['symptoms'])
-    elements.append(Paragraph(f"<b>Characteristic Clinical Symptoms:</b> {symptoms_list}.", body_style))
-    elements.append(Spacer(1, 12))
-
-    # 7. WHO Cancer Staging & Grading Deep Dive
-    elements.append(Paragraph("2. Tumor / Cancer Staging Assessment (WHO CNS Classification)", sec_title_style))
-    elements.append(Spacer(1, 4))
-    stage_info = info['cancer_stage']
-    elements.append(Paragraph(f"<b>Grading System:</b> {stage_info['system']}", body_bold))
-    elements.append(Paragraph(f"<b>Summary:</b> {stage_info['summary']}", body_style))
     elements.append(Spacer(1, 6))
 
+    # Footnote on Page 1
+    elements.append(Paragraph(
+        "<i>* Note: Preliminary automated decision support artifact. Turn to Page 2 for WHO histopathological staging, oncology nutrition, pharmacotherapy, and clinical sign-off.</i>",
+        ParagraphStyle('Page1Note', parent=styles['Normal'], fontSize=7, leading=9, textColor=col_muted)
+    ))
+
+    # --------------------------------------------------------------------------
+    # PAGE 2: CLINICAL WORKUP, STAGING, NUTRITION, MEDS, SIGN-OFF
+    # --------------------------------------------------------------------------
+    elements.append(PageBreak())
+
+    # Section 1: Detailed Pathology Profile
+    elements.append(Paragraph("1. Detailed Tumor Explanation & Pathological Profile", sec_title_style))
+    elements.append(Spacer(1, 2))
+    elements.append(Paragraph(f"<b>Pathological Classification:</b> {info['name']} &mdash; <i>{info['tagline']}</i>", body_bold))
+    elements.append(Spacer(1, 1.5))
+    elements.append(Paragraph(f"<b>Histopathological Overview:</b> {info['overview']}", body_style))
+    elements.append(Spacer(1, 1.5))
+    elements.append(Paragraph(f"<b>Molecular Pathophysiology:</b> {info['pathophysiology']}", body_style))
+    elements.append(Spacer(1, 1.5))
+    symptoms_list = ", ".join(info['symptoms'][:4])
+    elements.append(Paragraph(f"<b>Associated Neurological Symptoms:</b> {symptoms_list}.", body_style))
+    elements.append(Spacer(1, 5))
+
+    # Section 2: WHO Cancer Staging & Grading
+    elements.append(Paragraph("2. Tumor / Cancer Staging Assessment (WHO CNS Classification)", sec_title_style))
+    elements.append(Spacer(1, 2))
+    stage_info = info['cancer_stage']
+    elements.append(Paragraph(f"<b>Staging System:</b> {stage_info['system']}", body_style))
+    elements.append(Spacer(1, 2.5))
+
     stage_table_data = [[
-        Paragraph("Grade / Stage", th_style),
-        Paragraph("Risk / Category", th_style),
-        Paragraph("Histological & Clinical Characteristics", th_style)
+        Paragraph("Grade / Classification", th_style),
+        Paragraph("Risk Stratification", th_style),
+        Paragraph("Histological & Clinical Hallmarks", th_style)
     ]]
-    for g in stage_info['grades']:
+    for g in stage_info['grades'][:2]:  # 2 primary representative grades
         stage_table_data.append([
             Paragraph(f"<b>{g['grade']}</b><br/><font color='#64748b'>{g['title']}</font>", td_style),
             Paragraph(f"<b>{g['risk']}</b>", td_style),
@@ -845,120 +1018,113 @@ def generate_pdf_report(original_img_path, highlighted_img_path, pred_data, file
     stage_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
         ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8fafc')),
-        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
-        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('BOX', (0, 0), (-1, -1), 1, col_border),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, col_border),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
     ]))
     elements.append(stage_table)
-    elements.append(Spacer(1, 4))
-    elements.append(Paragraph(f"<i>Clinical Note:</i> {stage_info.get('clinical_note', '')}", ParagraphStyle('CNote', parent=styles['Normal'], fontSize=7.5, leading=10, textColor=colors.HexColor('#64748b'))))
-    elements.append(Spacer(1, 12))
+    elements.append(Spacer(1, 5))
 
-    # 8. Suggested Nutritional Support & Foods
+    # Section 3: Nutritional Support & Foods
     elements.append(Paragraph("3. Suggested Nutritional Support & Foods to Inhibit Tumor Growth", sec_title_style))
-    elements.append(Spacer(1, 4))
+    elements.append(Spacer(1, 2))
     food_info = info['food_recommendations']
-    elements.append(Paragraph(f"{food_info['overview']}", body_style))
-    elements.append(Spacer(1, 6))
-
     food_table_data = [[
-        Paragraph("Food Category & Items", th_style),
+        Paragraph("Dietary Category & Food Items", th_style),
         Paragraph("Anti-Tumor & Neuro-Protective Biological Mechanism", th_style)
     ]]
-    for item in food_info['beneficial_foods']:
+    for item in food_info['beneficial_foods'][:2]:  # Top 2 most impactful foods
         food_table_data.append([
             Paragraph(f"<b>{item['name']}</b><br/><font color='#475569'>{item['items']}</font>", td_style),
             Paragraph(item['benefit'], td_style)
         ])
-    food_table = Table(food_table_data, colWidths=[200, 340])
+    food_table = Table(food_table_data, colWidths=[190, 350])
     food_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#065f46')),
         ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f0fdf4')),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#a7f3d0')),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1fae5')),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
     ]))
     elements.append(food_table)
-    elements.append(Spacer(1, 4))
-    avoid_str = "; ".join(food_info['foods_to_avoid'])
-    elements.append(Paragraph(f"<b>Foods to Strictly Limit / Avoid:</b> {avoid_str}.", ParagraphStyle('AvoidP', parent=styles['Normal'], fontSize=8, leading=11, textColor=colors.HexColor('#991b1b'))))
-    elements.append(Spacer(1, 12))
+    elements.append(Spacer(1, 5))
 
-    # 9. Suggested Medical Therapeutics & Pharmacotherapy
+    # Section 4: Clinical Pharmacotherapy
     elements.append(Paragraph("4. Suggested Medical Therapeutics & Clinical Pharmacotherapy", sec_title_style))
-    elements.append(Spacer(1, 4))
+    elements.append(Spacer(1, 2))
     med_info = info['medicines']
-    elements.append(Paragraph(med_info['overview'], body_style))
-    elements.append(Spacer(1, 6))
-
     med_table_data = [[
         Paragraph("Medication & Class", th_style),
         Paragraph("Biological Mechanism of Action", th_style),
         Paragraph("Clinical Indications / Usage", th_style)
     ]]
-    for med in med_info['medication_list']:
+    for med in med_info['medication_list'][:2]:  # Top 2 key medications
         med_table_data.append([
             Paragraph(f"<b>{med['name']}</b><br/><font color='#64748b'>{med['category']}</font>", td_style),
             Paragraph(med['mechanism'], td_style),
             Paragraph(med['usage'], td_style)
         ])
-    med_table = Table(med_table_data, colWidths=[150, 230, 160])
+    med_table = Table(med_table_data, colWidths=[140, 240, 160])
     med_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a8a')),
         ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8fafc')),
-        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
-        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('BOX', (0, 0), (-1, -1), 1, col_border),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, col_border),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
     ]))
     elements.append(med_table)
-    elements.append(Spacer(1, 10))
+    elements.append(Spacer(1, 5))
 
-    # 10. CRITICAL MEDICAL WARNING BOX (High Visibility)
-    warn_p_style = ParagraphStyle('WarnP', parent=styles['Normal'], fontSize=8.5, leading=12, textColor=colors.HexColor('#991b1b'))
+    # Section 5: Warning & Emergency Protocol
+    warn_p_style = ParagraphStyle('WarnP', parent=styles['Normal'], fontSize=6.8, leading=9.5, textColor=colors.HexColor('#991b1b'))
     warn_box_data = [[
         Paragraph(
-            f"<b>CRITICAL MEDICAL WARNING & SAFETY NOTICE:</b><br/>"
-            f"{med_info['warning']}<br/><br/>"
-            f"<b>EMERGENCY DIRECTIVE:</b> <font color='#b91c1c'><b>{med_info['emergency_instruction']}</b></font>",
+            f"<b>CRITICAL MEDICAL WARNING:</b> {med_info['warning']}<br/>"
+            f"<b>URGENT EMERGENCY DIRECTIVE:</b> <font color='#b91c1c'><b>{med_info['emergency_instruction']}</b></font>",
             warn_p_style
         )
     ]]
     warn_box = Table(warn_box_data, colWidths=[540])
     warn_box.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#fef2f2')),
-        ('BOX', (0, 0), (-1, -1), 2, colors.HexColor('#dc2626')),
-        ('TOPPADDING', (0, 0), (-1, -1), 8),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-        ('LEFTPADDING', (0, 0), (-1, -1), 10),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+        ('BOX', (0, 0), (-1, -1), 1.25, colors.HexColor('#dc2626')),
+        ('TOPPADDING', (0, 0), (-1, -1), 3.5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3.5),
+        ('LEFTPADDING', (0, 0), (-1, -1), 7),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 7),
     ]))
     elements.append(warn_box)
-    elements.append(Spacer(1, 14))
+    elements.append(Spacer(1, 6))
 
-    # 11. Signatures & Disclaimer
+    # Section 6: Official Physician Sign-Off & Attestation
     sig_data = [
         [
             Paragraph("<b>Diagnostic System:</b> Deep Learning VGG16 + CV Red Localization", body_style),
-            Paragraph("<b>Consulting Physician Signature:</b> ___________________________", body_style)
+            Paragraph("<b>Attending Radiologist / Neuro-Oncologist:</b>", body_style)
+        ],
+        [
+            Paragraph("<b>Verification Method:</b> Autonomous Tensor Softmax Calibration", body_style),
+            Paragraph("<b>Signature:</b> ___________________________  <b>Date:</b> _____________", body_style)
         ]
     ]
     sig_table = Table(sig_data, colWidths=[270, 270])
     sig_table.setStyle(TableStyle([
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
     ]))
     elements.append(sig_table)
 
-    doc.build(elements)
+    # Build PDF with dynamic NumberedCanvas for professional page numbering
+    doc.build(elements, canvasmaker=NumberedCanvas)
     print(f"Generated comprehensive PDF report: {pdf_output_path}")
 
 

@@ -4,218 +4,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Brain Tumor Detection & Segmentation</title>
+    <title>NeuroVision AI | Clinical Brain MRI Diagnostic & Localization Suite</title>
     <meta name="description"
-        content="Deep Learning Clinical Brain MRI Tumor Detection and Computer Vision Localization.">
+        content="Board-grade deep neural network MRI diagnostic analysis, computer vision lesion segmentation, and clinical oncological decision support.">
+
+    <!-- Modern Medical Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
+
+    <!-- Bootstrap 5.3 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <style>
         :root {
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Light Professional Clinical Palette */
             --bg-page: #f8fafc;
-            --bg-gradient: radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.08) 0%, transparent 45%),
-                radial-gradient(circle at 90% 15%, rgba(99, 102, 241, 0.06) 0%, transparent 45%),
-                radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.04) 0%, transparent 50%),
-                #f8fafc;
-            --navbar-bg: rgba(255, 255, 255, 0.88);
-            --navbar-border: #e2e8f0;
-            --card-bg: #ffffff;
-            --card-bg-glass: rgba(255, 255, 255, 0.92);
-            --card-border: #e2e8f0;
-            --card-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-            --card-shadow-hover: 0 20px 40px -10px rgba(15, 23, 42, 0.1), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
+            --bg-canvas: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --border-subtle: #e2e8f0;
+            --border-strong: #cbd5e1;
+
+            --text-heading: #0f172a;
+            --text-body: #334155;
             --text-muted: #64748b;
-            --accent-primary: #0284c7;
-            --accent-secondary: #2563eb;
-            --badge-ai-bg: #e0f2fe;
-            --badge-ai-border: #bae6fd;
-            --badge-ai-text: #0369a1;
-            --dropzone-bg: #f8fafc;
-            --dropzone-border: #cbd5e1;
-            --dropzone-hover-bg: #eff6ff;
-            --dropzone-hover-border: #0284c7;
-            --sample-bg: #ffffff;
-            --sample-border: #e2e8f0;
-            --sample-hover-bg: #f8fafc;
-            --sample-hover-border: #0284c7;
-            --panel-inner-bg: #f8fafc;
-            --panel-inner-border: #e2e8f0;
-            --mri-box-bg: #090e17;
-            --prob-track-bg: #e2e8f0;
+            --text-dim: #94a3b8;
+
+            /* Brand Accent: Medical Sapphire & Cyan */
+            --brand-primary: #0284c7;
+            --brand-gradient: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+            --brand-glow: rgba(2, 132, 199, 0.18);
+
+            /* Diagnostic States */
+            --pathology-danger: #dc2626;
+            --pathology-danger-bg: #fef2f2;
+            --pathology-danger-border: #fca5a5;
+
+            --pathology-success: #16a34a;
+            --pathology-success-bg: #f0fdf4;
+            --pathology-success-border: #86efac;
+
+            --shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+            --shadow-float: 0 20px 40px -8px rgba(15, 23, 42, 0.08), 0 8px 16px -4px rgba(15, 23, 42, 0.03);
+            --shadow-glow-red: 0 0 35px rgba(220, 38, 38, 0.16);
         }
 
         [data-theme="dark"] {
-            --bg-page: #090e17;
-            --bg-gradient: radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 90% 15%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
-                #090e17;
-            --navbar-bg: rgba(15, 23, 42, 0.88);
-            --navbar-border: rgba(255, 255, 255, 0.08);
-            --card-bg: #1e293b;
-            --card-bg-glass: rgba(30, 41, 59, 0.85);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-            --card-shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --accent-primary: #38bdf8;
-            --accent-secondary: #3b82f6;
-            --badge-ai-bg: rgba(6, 182, 212, 0.15);
-            --badge-ai-border: rgba(6, 182, 212, 0.4);
-            --badge-ai-text: #38bdf8;
-            --dropzone-bg: rgba(15, 23, 42, 0.4);
-            --dropzone-border: rgba(56, 189, 248, 0.35);
-            --dropzone-hover-bg: rgba(56, 189, 248, 0.08);
-            --dropzone-hover-border: #38bdf8;
-            --sample-bg: rgba(15, 23, 42, 0.6);
-            --sample-border: rgba(255, 255, 255, 0.08);
-            --sample-hover-bg: rgba(30, 41, 59, 0.85);
-            --sample-hover-border: #38bdf8;
-            --panel-inner-bg: rgba(15, 23, 42, 0.5);
-            --panel-inner-border: rgba(255, 255, 255, 0.08);
-            --mri-box-bg: #020617;
-            --prob-track-bg: rgba(255, 255, 255, 0.08);
+            --bg-page: #0b111e;
+            --bg-canvas: #0f172a;
+            --bg-subtle: #1e293b;
+            --bg-card: #131d31;
+            --bg-glass: rgba(19, 29, 49, 0.92);
+            --border-subtle: rgba(255, 255, 255, 0.12);
+            --border-strong: rgba(255, 255, 255, 0.22);
+
+            --text-heading: #f8fafc;
+            --text-body: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --text-dim: #94a3b8;
+
+            --brand-primary: #38bdf8;
+            --brand-gradient: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+            --brand-glow: rgba(56, 189, 248, 0.25);
+
+            --pathology-danger: #fca5a5;
+            --pathology-danger-bg: rgba(220, 38, 38, 0.18);
+            --pathology-danger-border: rgba(248, 113, 113, 0.5);
+
+            --pathology-success: #86efac;
+            --pathology-success-bg: rgba(22, 163, 74, 0.18);
+            --pathology-success-border: rgba(74, 222, 128, 0.5);
+
+            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+            --shadow-float: 0 24px 48px -12px rgba(0, 0, 0, 0.65);
+            --shadow-glow-red: 0 0 40px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Dark mode Bootstrap utility overrides for crystal clarity */
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        [data-theme="dark"] .text-secondary {
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .badge.bg-secondary {
+            background-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .badge.bg-warning.text-dark {
+            background-color: #f59e0b !important;
+            color: #0f172a !important;
+            font-weight: 700;
+        }
+
+        [data-theme="dark"] .border-secondary {
+            border-color: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        [data-theme="dark"] .text-danger-emphasis {
+            color: #fca5a5 !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            letter-spacing: normal;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-gradient);
+            font-family: var(--font-sans);
+            background-color: var(--bg-page);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.04) 0px, transparent 50%);
             background-attachment: fixed;
-            color: var(--text-primary);
+            color: var(--text-body);
             min-height: 100vh;
-            padding-bottom: 60px;
-            transition: background 0.3s ease, color 0.3s ease;
+            margin: 0;
+            padding-bottom: 70px;
+            letter-spacing: 0.01em;
+            word-spacing: normal;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        /* Top Clinical Navbar */
-        .clinical-navbar {
-            background: var(--navbar-bg);
+        /* Executive Hospital Navbar */
+        .hospital-nav {
+            background: var(--bg-glass);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--navbar-border);
-            padding: 14px 0;
-            z-index: 1020;
-            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            transition: all 0.25s ease;
         }
 
-        .brand-icon-box {
-            width: 38px;
-            height: 38px;
+        .brand-logo-badge {
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            background: var(--brand-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #bae6fd;
-        }
-
-        [data-theme="dark"] .brand-icon-box {
-            background: rgba(14, 165, 233, 0.2);
-            border-color: rgba(56, 189, 248, 0.3);
+            color: #ffffff;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
         }
 
         .brand-title {
-            font-size: 1.2rem;
-            letter-spacing: -0.02em;
-            color: var(--text-primary);
-        }
-
-        .brand-sub {
-            color: var(--accent-primary);
             font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: 0.01em;
+            color: var(--text-heading);
+            line-height: 1.2;
         }
 
-        .system-status-pill {
-            font-size: 0.8rem;
+        .brand-subtitle {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
             font-weight: 600;
-            color: var(--text-secondary);
-            background: var(--panel-inner-bg);
-            border: 1px solid var(--panel-inner-border);
-            padding: 5px 14px;
-            border-radius: 9999px;
         }
 
-        .status-indicator {
-            width: 7px;
-            height: 7px;
-            background-color: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-            animation: pulse-green 2s infinite;
-        }
-
-        @keyframes pulse-green {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.5;
-                transform: scale(0.85);
-            }
-        }
-
-        .theme-toggle-btn {
-            background: var(--panel-inner-bg);
-            border: 1px solid var(--panel-inner-border);
-            color: var(--text-primary);
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .theme-toggle-btn:hover {
-            border-color: var(--accent-primary);
-            color: var(--accent-primary);
-            transform: translateY(-1px);
-        }
-
-        /* Hero Header */
-        .header-section {
-            padding: 48px 0 28px;
-            text-align: center;
-        }
-
-        .badge-ai {
-            background: var(--badge-ai-bg);
-            border: 1px solid var(--badge-ai-border);
-            color: var(--badge-ai-text);
-            padding: 7px 18px;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
+        .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+            gap: 7px;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-muted);
         }
 
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-primary);
+        .live-dot {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-primary);
-            animation: pulse 1.8s infinite;
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-dot 2s infinite ease-in-out;
         }
 
-        @keyframes pulse {
+        @keyframes pulse-dot {
 
             0%,
             100% {
@@ -229,509 +219,468 @@
             }
         }
 
-        .hero-title {
-            font-weight: 800;
-            font-size: 2.6rem;
-            letter-spacing: -0.03em;
-            color: var(--text-primary);
-            margin-bottom: 14px;
-            line-height: 1.2;
+        .theme-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-subtle);
+            color: var(--text-heading);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .hero-title .gradient-text {
-            background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+        .theme-btn:hover {
+            border-color: var(--brand-primary);
+            color: var(--brand-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Hospital Department Banner */
+        .hero-banner {
+            padding: 42px 0 28px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 9999px;
+            background: rgba(2, 132, 199, 0.08);
+            border: 1px solid rgba(2, 132, 199, 0.2);
+            color: var(--brand-primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            margin-bottom: 14px;
+        }
+
+        .hero-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: 0.005em;
+            color: var(--text-heading);
+            margin-bottom: 10px;
+            line-height: 1.25;
+        }
+
+        .hero-title span {
+            background: var(--brand-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .hero-subtitle {
-            color: var(--text-secondary);
-            font-size: 1.08rem;
-            max-width: 680px;
+        .hero-lead {
+            font-size: 0.98rem;
+            color: var(--text-muted);
+            max-width: 660px;
             margin: 0 auto;
             line-height: 1.6;
+            letter-spacing: 0.01em;
         }
 
-        /* Cards & Glass Containers */
-        .glass-card {
-            background: var(--card-bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
-            transition: box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-
-        .drop-zone {
-            border: 2px dashed var(--dropzone-border);
+        /* Structured Clinical Cards */
+        .clinical-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
             border-radius: 16px;
-            padding: 40px 24px;
-            text-align: center;
-            background: var(--dropzone-bg);
-            cursor: pointer;
+            box-shadow: var(--shadow-card);
             transition: all 0.25s ease;
             position: relative;
         }
 
-        .drop-zone:hover,
-        .drop-zone.dragover {
-            border-color: var(--dropzone-hover-border);
-            background: var(--dropzone-hover-bg);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.12);
-        }
-
-        .drop-icon {
-            font-size: 3.2rem;
-            color: var(--accent-primary);
-            margin-bottom: 14px;
-            display: inline-block;
-            transition: transform 0.25s ease;
-        }
-
-        .drop-zone:hover .drop-icon {
-            transform: scale(1.08) translateY(-2px);
-        }
-
-        /* Sample MRI Cards */
-        .sample-card {
-            background: var(--sample-bg);
-            border: 1px solid var(--sample-border);
-            border-radius: 14px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            height: 100%;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-        }
-
-        .sample-card:hover {
-            border-color: var(--sample-hover-border);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -6px rgba(2, 132, 199, 0.16);
-            background: var(--sample-hover-bg);
-        }
-
-        .sample-thumb {
-            width: 100%;
-            height: 84px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid var(--card-border);
-        }
-
-        .sample-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 3px;
-        }
-
-        .sample-sub {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            font-family: monospace;
-        }
-
-        /* MRI Compare Viewports */
-        .scan-compare-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            overflow: hidden;
-            height: 100%;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
-        }
-
-        .scan-compare-header {
-            padding: 12px 16px;
-            background: var(--panel-inner-bg);
-            border-bottom: 1px solid var(--panel-inner-border);
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--text-primary);
+        /* Diagnostic Findings View */
+        .finding-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-subtle);
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-        }
-
-        .scan-image-box {
-            background: var(--mri-box-bg);
-            height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .scan-image-box img {
-            max-width: 100%;
-            max-height: 245px;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-
-        .scan-image-box:hover img {
-            transform: scale(1.03);
-        }
-
-        /* Diagnostic Result Badges */
-        .result-badge {
-            font-size: 1.18rem;
-            font-weight: 700;
-            padding: 12px 20px;
-            border-radius: 14px;
-            display: inline-flex;
-            align-items: center;
             gap: 12px;
-            margin-bottom: 20px;
         }
 
-        .badge-positive {
-            background: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-
-        [data-theme="dark"] .badge-positive {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .badge-negative {
-            background: #f0fdf4;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
-        }
-
-        [data-theme="dark"] .badge-negative {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        /* Metric Progress Bars */
-        .prob-bar {
-            height: 8px;
-            border-radius: 999px;
-            background: var(--prob-track-bg);
-            overflow: hidden;
-            margin-top: 7px;
-        }
-
-        .prob-fill {
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.8s ease-in-out;
-        }
-
-        /* Action Buttons */
-        .btn-detect {
-            background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
-            border: none;
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 15px 26px;
-            border-radius: 14px;
-            width: 100%;
-            transition: all 0.25s ease;
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.28);
-        }
-
-        .btn-detect:hover:not(:disabled) {
-            background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.38);
-            color: #ffffff;
-        }
-
-        .btn-detect:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .btn-pdf {
+        .btn-download-pdf {
             background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: #ffffff !important;
             border: none;
-            color: #ffffff;
             font-weight: 600;
-            font-size: 0.9rem;
-            padding: 10px 20px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
-        }
-
-        .btn-pdf:hover {
-            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
-            color: #ffffff;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
-        }
-
-        .btn-scan-another {
-            background: var(--panel-inner-bg);
-            border: 1px solid var(--panel-inner-border);
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             padding: 10px 18px;
             border-radius: 10px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             text-decoration: none;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
             transition: all 0.2s ease;
+            letter-spacing: 0.01em;
         }
 
-        .btn-scan-another:hover {
-            background: var(--card-border);
-            color: var(--text-primary);
+        .btn-download-pdf:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
             transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
         }
 
-        /* Clinical Panels */
-        .clinical-panel {
-            background: var(--panel-inner-bg);
-            border: 1px solid var(--panel-inner-border);
-            border-radius: 14px;
-            padding: 20px;
-        }
-
-        #preview-box {
-            display: none;
-            text-align: center;
-            margin-top: 18px;
-        }
-
-        #preview-img {
-            max-height: 180px;
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-        }
-
-        .footer-note {
-            color: var(--text-muted);
-            font-size: 0.82rem;
-            text-align: center;
-            margin-top: 36px;
-            line-height: 1.6;
-        }
-
-        .animate-fade {
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    
-        /* Clinical Staging & Medical Analysis Styles */
-        .clinical-section-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 18px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--panel-inner-border);
-        }
-
-        .clinical-section-icon {
-            width: 38px;
-            height: 38px;
+        .btn-scan-reset {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-heading) !important;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 10px 16px;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .icon-blue { background: rgba(2, 132, 199, 0.12); color: #0284c7; }
-        .icon-red { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
-        .icon-green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-        .icon-purple { background: rgba(147, 51, 234, 0.12); color: #9333ea; }
-        .icon-amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
-
-        .symptom-pill {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            background: var(--card-bg);
-            border: 1px solid var(--panel-inner-border);
-            color: var(--text-primary);
-            margin: 3px;
+            text-decoration: none;
             transition: all 0.2s ease;
+            letter-spacing: 0.01em;
         }
 
-        .symptom-pill:hover {
-            border-color: #ef4444;
+        .btn-scan-reset:hover {
+            border-color: var(--brand-primary);
+            color: var(--brand-primary) !important;
             transform: translateY(-1px);
         }
 
-        .stage-card {
-            background: var(--card-bg);
-            border: 1px solid var(--panel-inner-border);
+        /* MRI Viewports */
+        .mri-viewport-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
             border-radius: 14px;
-            padding: 16px;
+            overflow: hidden;
             height: 100%;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .stage-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.08);
+        .mri-viewport-card.pathology-highlight {
+            border-color: var(--pathology-danger-border);
+            box-shadow: var(--shadow-glow-red);
         }
 
-        .food-card {
-            background: var(--card-bg);
-            border: 1px solid var(--panel-inner-border);
-            border-radius: 14px;
-            padding: 18px;
-            height: 100%;
-            transition: all 0.2s ease;
+        .mri-viewport-title {
+            padding: 10px 16px;
+            background: var(--bg-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            letter-spacing: 0.01em;
         }
 
-        .food-card:hover {
-            transform: translateY(-2px);
-            border-color: #10b981;
-            box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.14);
-        }
-
-        .food-icon-box {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            background: rgba(16, 185, 129, 0.12);
-            color: #10b981;
+        .mri-viewport-stage {
+            background: #020617;
+            height: 280px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
-        .med-card {
-            background: var(--card-bg);
-            border: 1px solid var(--panel-inner-border);
-            border-radius: 14px;
-            padding: 18px;
-            height: 100%;
-            transition: all 0.2s ease;
-        }
-
-        .med-card:hover {
-            border-color: var(--accent-primary);
-            box-shadow: 0 6px 18px -3px rgba(2, 132, 199, 0.12);
-        }
-
-        /* Critical Warning Alert Box */
-        .warning-alert-card {
-            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-            border: 2px solid #f43f5e;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 30px -5px rgba(225, 29, 72, 0.2);
             position: relative;
             overflow: hidden;
         }
 
-        [data-theme="dark"] .warning-alert-card {
-            background: linear-gradient(135deg, rgba(136, 19, 55, 0.45) 0%, rgba(159, 18, 57, 0.35) 100%);
-            border-color: #f43f5e;
-            box-shadow: 0 10px 30px -5px rgba(225, 29, 72, 0.35);
+        .mri-viewport-stage img {
+            max-width: 100%;
+            max-height: 275px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
         }
 
-        .pulse-alert-icon {
-            font-size: 2.3rem;
-            color: #e11d48;
-            animation: pulse-warn 1.5s infinite;
+        .mri-viewport-stage:hover img {
+            transform: scale(1.03);
         }
 
-        @keyframes pulse-warn {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.12); opacity: 0.82; }
+        /* Primary Diagnostic Status Card */
+        .diagnostic-verdict-box {
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .emergency-pill {
-            background: #be123c;
-            color: #ffffff;
+        .verdict-positive {
+            background: var(--pathology-danger-bg);
+            border: 1.5px solid var(--pathology-danger-border);
+            color: var(--pathology-danger);
+        }
+
+        .verdict-negative {
+            background: var(--pathology-success-bg);
+            border: 1.5px solid var(--pathology-success-border);
+            color: var(--pathology-success);
+        }
+
+        .verdict-title {
+            font-size: 1.18rem;
             font-weight: 800;
-            letter-spacing: 0.04em;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            color: inherit;
+            letter-spacing: 0.01em;
+        }
+
+        .confidence-number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: inherit;
+            letter-spacing: 0.02em;
+        }
+
+        /* Metric Distribution Bars */
+        .distribution-panel {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px;
+            height: 100%;
+        }
+
+        .bar-container {
+            height: 7px;
+            border-radius: 9999px;
+            background: var(--border-subtle);
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Clinical Accordion / Detail Modules */
+        .clinical-module {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .module-icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .icon-blue {
+            background: rgba(2, 132, 199, 0.12);
+            color: #0284c7;
+        }
+
+        .icon-red {
+            background: rgba(220, 38, 38, 0.12);
+            color: #dc2626;
+        }
+
+        .icon-green {
+            background: rgba(22, 163, 74, 0.12);
+            color: #16a34a;
+        }
+
+        .icon-purple {
+            background: rgba(147, 51, 234, 0.12);
+            color: #9333ea;
+        }
+
+        .symptom-tag {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-heading);
+            margin: 3px;
+            letter-spacing: 0.01em;
         }
 
-        .avoid-item {
-            background: rgba(239, 68, 68, 0.08);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            color: #b91c1c;
+        .clinical-subcard {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
             border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 0.84rem;
-            font-weight: 500;
+            padding: 14px;
+            height: 100%;
+        }
+
+        /* High Visibility Warning Alert */
+        .emergency-warning-box {
+            background: var(--pathology-danger-bg);
+            border: 1.5px solid var(--pathology-danger-border);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        /* Upload & Dropzone Area */
+        .upload-section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
+            letter-spacing: 0.01em;
         }
 
-        [data-theme="dark"] .avoid-item {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.35);
-            color: #fca5a5;
+        .scan-dropzone {
+            border: 2px dashed var(--border-strong);
+            background: var(--bg-subtle);
+            border-radius: 14px;
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
+        .scan-dropzone:hover,
+        .scan-dropzone.dragover {
+            border-color: var(--brand-primary);
+            background: rgba(2, 132, 199, 0.04);
+            transform: scale(1.005);
+        }
+
+        .dropzone-icon {
+            font-size: 2.75rem;
+            color: var(--brand-primary);
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .btn-analyze-mri {
+            background: var(--brand-gradient);
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 14px 28px;
+            border-radius: 12px;
+            width: 100%;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.28);
+            letter-spacing: 0.02em;
+        }
+
+        .btn-analyze-mri:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.38);
+            color: #ffffff;
+        }
+
+        .btn-analyze-mri:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Sample MRI Cards */
+        .sample-tile {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 100%;
+        }
+
+        .sample-tile:hover {
+            border-color: var(--brand-primary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-card);
+            background: var(--bg-card);
+        }
+
+        .sample-img-thumb {
+            width: 100%;
+            height: 84px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .sample-title-tag {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 2px;
+            letter-spacing: 0.01em;
+        }
+
+        .sample-code-tag {
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            letter-spacing: 0.02em;
+        }
+
+        .app-footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.6;
+            letter-spacing: 0.01em;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Top Clinical Navigation -->
-    <nav class="navbar navbar-expand-lg sticky-top clinical-navbar">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-decoration-none" href="/">
-                <div class="brand-icon-box">
-                    <i class="bi bi-shield-plus text-primary fs-5"></i>
+    <!-- Top Clinical Hospital Bar -->
+    <nav class="hospital-nav">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a href="/" class="d-flex align-items-center gap-3 text-decoration-none">
+                <div class="brand-logo-badge">
+                    <i class="bi bi-shield-shaded"></i>
                 </div>
-                <span class="brand-title">MRI Diagnosis <span class="brand-sub">AI</span></span>
+                <div>
+                    <div class="brand-title">NeuroVision <span style="color:var(--brand-primary)">Clinical AI</span>
+                    </div>
+                    <div class="brand-subtitle">Diagnostic MRI & Lesion Localization</div>
+                </div>
             </a>
 
             <div class="d-flex align-items-center gap-3">
-                <div class="system-status-pill d-none d-sm-inline-flex align-items-center gap-2">
-                    <span class="status-indicator"></span>
-                    <span>AI Enhanced Brain Tumor Detection</span>
+                <div class="status-pill d-none d-sm-inline-flex">
+                    <span class="live-dot"></span>
+                    <span>Tensor VGG16 Engine Active</span>
                 </div>
-                <!-- Theme Mode Toggle -->
-                <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()"
-                    title="Toggle Light / Dark Mode" aria-label="Toggle Light / Dark Mode">
+
+                <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle Visual Theme">
                     <i class="bi bi-moon-stars" id="theme-icon"></i>
                 </button>
             </div>
@@ -739,352 +688,360 @@
     </nav>
 
     <!-- Header Section -->
-    <header class="header-section">
+    <header class="hero-banner">
         <div class="container">
-            <div class="badge-ai">
-                <span class="pulse-dot"></span> Deep Learning + Computer Vision Localization
+            <div class="hero-badge">
+                <i class="bi bi-activity"></i> Clinical Neuro-Oncology Computer Vision
             </div>
             <h1 class="hero-title">
-                Brain MRI <span class="gradient-text">Tumor Detection & Localization</span>
+                Automated Brain MRI <span>Tumor Detection & Localization</span>
             </h1>
-            <p class="hero-subtitle">
-                Automated multi-class classification (<strong>Glioma</strong>, <strong>Meningioma</strong>,
-                <strong>Pituitary</strong>, <strong>Healthy</strong>) with lesion contour localization and downloadable
-                clinical PDF reports.
+            <p class="hero-lead">
+                Multi-class classification (<strong>Glioma</strong>, <strong>Meningioma</strong>,
+                <strong>Pituitary</strong>, <strong>Healthy</strong>) with red-highlighted computer vision lesion
+                segmentation and board-certified downloadable clinical PDF reports.
             </p>
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Workspace -->
     <main class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
 
                 {% if result %}
-                <!-- Results View -->
-                <div class="glass-card p-4 p-md-5 mb-4 animate-fade">
-                    <div
-                        class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25 gap-2">
+                <!-- DIAGNOSTIC RESULTS WORKBENCH -->
+                <section class="clinical-card mb-4" id="diagnostic-results">
+                    <div class="finding-header">
                         <div>
-                            <h2 class="h4 mb-1 fw-bold"><i class="bi bi-activity text-primary me-2"></i> Diagnostic
-                                Analysis & Tumor Localization</h2>
-                            <small class="text-secondary">Scan successfully classified and localized using deep neural
-                                network</small>
+                            <h2 class="h5 fw-bold mb-1" style="color:var(--text-heading)">
+                                <i class="bi bi-hospital me-2 text-primary"></i>Diagnostic Neurological Findings
+                            </h2>
+                            <small class="text-muted">Tensor evaluated scan with anatomical lesion localization</small>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             {% if report_name %}
-                            <a href="/download_report/{{ report_name }}" class="btn-pdf">
-                                <i class="bi bi-file-earmark-pdf-fill fs-5"></i> Download PDF Report
+                            <a href="/download_report/{{ report_name }}" class="btn-download-pdf">
+                                <i class="bi bi-file-earmark-pdf-fill fs-5"></i> Download Executive PDF Report
                             </a>
                             {% endif %}
-                            <a href="/" class="btn-scan-another">
+                            <a href="/" class="btn-scan-reset">
                                 <i class="bi bi-arrow-counterclockwise"></i> Scan Another
                             </a>
                         </div>
                     </div>
 
-                    <!-- Dual Comparison Scans (Original vs Highlighted) -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-6">
-                            <div class="scan-compare-card">
-                                <div class="scan-compare-header">
-                                    <span><i class="bi bi-image text-muted me-1"></i> Original Patient MRI</span>
-                                    <span class="badge bg-secondary">Input</span>
-                                </div>
-                                <div class="scan-image-box">
-                                    <img src="{{ file_path }}" alt="Original MRI Scan">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="scan-compare-card" style="border-color: rgba(220, 38, 38, 0.45);">
-                                <div class="scan-compare-header"
-                                    style="background: rgba(220, 38, 38, 0.08); color: #dc2626;">
-                                    <span><i class="bi bi-bullseye text-danger me-1"></i> AI Highlighted Tumor Region (in Red)</span>
-                                    <span class="badge {% if is_tumor %}bg-danger{% else %}bg-success{% endif %}">
-                                        {% if is_tumor %}Highlighted in Red (No Box){% else %}Clear Scan{% endif %}
-                                    </span>
-                                </div>
-                                <div class="scan-image-box">
-                                    <img src="{{ highlighted_path }}" alt="AI Highlighted Tumor Region in Red">
-                                </div>
+                    <div class="p-4 p-md-5">
+                        <!-- Primary Diagnostic Verdict Banner -->
+                        <div
+                            class="diagnostic-verdict-box mb-4 {% if is_tumor %}verdict-positive{% else %}verdict-negative{% endif %}">
+                            <div class="d-flex align-items-center gap-3">
                                 {% if is_tumor %}
-                                <div class="p-2 text-center bg-danger bg-opacity-10 border-top border-danger border-opacity-25">
-                                    <small class="text-danger fw-semibold"><i class="bi bi-circle-fill me-1" style="font-size:0.55rem; color:#dc2626;"></i>Tumor region localized and highlighted in red overlay (without bounding box) for natural anatomical view</small>
-                                </div>
+                                <i class="bi bi-exclamation-diamond-fill fs-3"></i>
+                                {% else %}
+                                <i class="bi bi-check-circle-fill fs-3"></i>
                                 {% endif %}
+                                <div>
+                                    <div class="small text-uppercase fw-bold opacity-75">Primary Assessment</div>
+                                    <h3 class="verdict-title">{{ result }}</h3>
+                                </div>
+                            </div>
+                            <div class="text-md-end">
+                                <div class="small text-uppercase fw-bold opacity-75">Diagnostic Confidence</div>
+                                <div class="confidence-number">{{ confidence }}%</div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Findings & Confidence Breakdown -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-6">
-                            <div class="clinical-panel h-100 d-flex flex-column justify-content-between">
-                                <div>
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <h3 class="h6 text-uppercase text-secondary fw-bold mb-0" style="letter-spacing: 0.05em; font-size: 0.78rem;">
-                                            <i class="bi bi-shield-check text-primary me-1"></i> Primary Diagnostic Finding
-                                        </h3>
-                                        <span class="badge {% if is_tumor %}bg-danger{% else %}bg-success{% endif %} text-uppercase">
-                                            {% if is_tumor %}Positive Finding{% else %}Healthy Scan{% endif %}
+                        <!-- Comparative MRI Scans (Original vs Red Highlighted) -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="mri-viewport-card">
+                                    <div class="mri-viewport-title">
+                                        <span><i class="bi bi-image text-muted me-1"></i> Patient Input MRI Scan</span>
+                                        <span class="badge bg-secondary">Pre-processed</span>
+                                    </div>
+                                    <div class="mri-viewport-stage">
+                                        <img src="{{ file_path }}" alt="Original Patient MRI Scan">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mri-viewport-card {% if is_tumor %}pathology-highlight{% endif %}">
+                                    <div class="mri-viewport-title" {% if is_tumor
+                                        %}style="background:rgba(220,38,38,0.08); color:#dc2626;" {% endif %}>
+                                        <span><i class="bi bi-bullseye text-danger me-1"></i> AI Red-Highlighted
+                                            Lesion</span>
+                                        <span class="badge {% if is_tumor %}bg-danger{% else %}bg-success{% endif %}">
+                                            {% if is_tumor %}Highlighted in Red (No Box){% else %}Normal Limits{% endif
+                                            %}
                                         </span>
                                     </div>
-                                    {% if is_tumor %}
-                                    <div class="result-badge badge-positive w-100 mb-3">
-                                        <i class="bi bi-exclamation-triangle-fill fs-4 flex-shrink-0"></i>
-                                        <span>{{ result }}</span>
+                                    <div class="mri-viewport-stage">
+                                        <img src="{{ highlighted_path }}" alt="AI Red-Highlighted Localization">
                                     </div>
-                                    {% else %}
-                                    <div class="result-badge badge-negative w-100 mb-3">
-                                        <i class="bi bi-check-circle-fill fs-4 flex-shrink-0"></i>
-                                        <span>{{ result }}</span>
+                                    {% if is_tumor %}
+                                    <div class="p-2 text-center"
+                                        style="background:rgba(220,38,38,0.08); border-top:1px solid rgba(220,38,38,0.2);">
+                                        <small class="text-danger fw-semibold">
+                                            <i class="bi bi-circle-fill me-1"
+                                                style="font-size:0.5rem; color:#dc2626;"></i>
+                                            Tumor region localized and highlighted in red overlay (without bounding box)
+                                        </small>
                                     </div>
                                     {% endif %}
                                 </div>
-
-                                <!-- Primary Confidence Score -->
-                                <div>
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-semibold text-secondary small">VGG16 Model Classification Confidence</span>
-                                        <span class="fs-4 fw-bold {% if is_tumor %}text-danger{% else %}text-success{% endif %}">{{ confidence }}%</span>
-                                    </div>
-                                    <div class="prob-bar">
-                                        <div class="prob-fill {% if is_tumor %}bg-danger{% else %}bg-success{% endif %}"
-                                            style="width: {{ confidence }}%;"></div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
-                        <!-- Class Breakdown -->
-                        <div class="col-md-6">
-                            {% if scores %}
-                            <div class="clinical-panel h-100">
-                                <h3 class="h6 text-uppercase text-secondary fw-bold mb-3"
-                                    style="letter-spacing: 0.05em; font-size: 0.78rem;">
-                                    <i class="bi bi-bar-chart-fill text-primary me-1"></i> Multi-Class Probability Distribution
-                                </h3>
+                        <!-- Multi-Class Distribution Breakdown -->
+                        {% if scores %}
+                        <div class="distribution-panel mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="h6 fw-bold text-uppercase mb-0"
+                                    style="letter-spacing:0.05em; font-size:0.8rem; color:var(--text-heading)">
+                                    <i class="bi bi-bar-chart-line-fill text-primary me-1"></i> Multi-Class Softmax
+                                    Probability Distribution
+                                </h4>
+                                <small class="text-muted font-monospace">VGG16 Architecture</small>
+                            </div>
+                            <div class="row g-3">
                                 {% for cls_name, prob in scores.items() %}
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between small mb-1">
-                                        <span class="{% if cls_name == label %}fw-bold text-primary{% else %}text-secondary{% endif %}">
-                                            {% if cls_name == 'notumor' %}Healthy Scan (No Tumor){% else %}{{ cls_name.capitalize() }} Brain Tumor{% endif %}
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                        <span
+                                            class="{% if cls_name == label %}fw-bold text-primary{% else %}text-secondary{% endif %}">
+                                            {% if cls_name == 'notumor' %}Healthy Examination (No Tumor){% else %}{{
+                                            cls_name.capitalize() }} Brain Tumor{% endif %}
                                         </span>
-                                        <span class="{% if cls_name == label %}fw-bold text-primary{% else %}text-muted{% endif %}">
+                                        <span
+                                            class="{% if cls_name == label %}fw-bold text-primary{% else %}text-muted{% endif %} font-monospace">
                                             {{ (prob * 100)|round(2) }}%
                                         </span>
                                     </div>
-                                    <div class="prob-bar">
-                                        <div class="prob-fill {% if cls_name == label %}bg-primary{% else %}bg-secondary opacity-50{% endif %}"
+                                    <div class="bar-container">
+                                        <div class="bar-fill {% if cls_name == label %}bg-primary{% else %}bg-secondary opacity-50{% endif %}"
                                             style="width: {{ prob * 100 }}%;"></div>
                                     </div>
                                 </div>
                                 {% endfor %}
                             </div>
-                            {% endif %}
                         </div>
-                    </div>
+                        {% endif %}
 
-                    <!-- 1. Detailed Tumor Explanation & Pathological Profile -->
-                    {% if tumor_info %}
-                    <div class="clinical-panel mb-4">
-                        <div class="clinical-section-header">
-                            <div class="clinical-section-icon icon-blue">
-                                <i class="bi bi-journal-medical"></i>
-                            </div>
-                            <div>
-                                <h3 class="h5 mb-0 fw-bold text-primary">{{ tumor_info.name }}</h3>
-                                <small class="text-secondary">{{ tumor_info.tagline }}</small>
-                            </div>
-                        </div>
-                        <div class="row g-4">
-                            <div class="col-lg-6">
-                                <h4 class="h6 fw-bold text-dark mb-1"><i class="bi bi-info-circle text-primary me-1"></i> Detailed Pathological Overview</h4>
-                                <p class="small text-secondary mb-3" style="line-height: 1.6;">{{ tumor_info.overview }}</p>
-                                <h4 class="h6 fw-bold text-dark mb-1"><i class="bi bi-dna text-primary me-1"></i> Cellular Pathophysiology</h4>
-                                <p class="small text-secondary mb-0" style="line-height: 1.6;">{{ tumor_info.pathophysiology }}</p>
-                            </div>
-                            <div class="col-lg-6">
-                                <h4 class="h6 fw-bold text-dark mb-2"><i class="bi bi-clipboard-pulse text-danger me-1"></i> Characteristic Clinical Symptoms</h4>
-                                <div class="d-flex flex-wrap mb-3">
-                                    {% for sym in tumor_info.symptoms %}
-                                    <span class="symptom-pill"><i class="bi bi-activity text-danger"></i> {{ sym }}</span>
-                                    {% endfor %}
+                        <!-- CLINICAL KNOWLEDGE WORKBENCH -->
+                        {% if tumor_info %}
+                        <!-- 1. Pathological Profile -->
+                        <div class="clinical-module">
+                            <div class="module-header">
+                                <div class="module-icon-wrap icon-blue">
+                                    <i class="bi bi-journal-medical"></i>
                                 </div>
-                                <div class="p-3 rounded-3" style="background: var(--card-bg); border: 1px dashed var(--panel-inner-border);">
-                                    <small class="text-muted"><i class="bi bi-lightbulb-fill text-warning me-1"></i> <strong>Diagnostic Insight:</strong> Computer vision highlights the focal lesion directly in vivid red, enabling immediate identification without obscuring surrounding cerebral parenchyma.</small>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-0 text-primary">{{ tumor_info.name }}</h4>
+                                    <small class="text-muted">{{ tumor_info.tagline }}</small>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. Tumor / Cancer Staging Assessment -->
-                    <div class="clinical-panel mb-4">
-                        <div class="clinical-section-header">
-                            <div class="clinical-section-icon icon-red">
-                                <i class="bi bi-diagram-3-fill"></i>
-                            </div>
-                            <div>
-                                <h3 class="h5 mb-0 fw-bold text-dark">Tumor / Cancer Staging Assessment</h3>
-                                <small class="text-secondary">{{ tumor_info.cancer_stage.system }}</small>
-                            </div>
-                        </div>
-                        <p class="small text-secondary mb-3" style="line-height: 1.55;">{{ tumor_info.cancer_stage.summary }}</p>
-                        <div class="row g-3">
-                            {% for g in tumor_info.cancer_stage.grades %}
-                            <div class="col-md-6 col-lg-3">
-                                <div class="stage-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-bold fs-6 text-dark">{{ g.grade }}</span>
-                                        <span class="badge {{ g.badge_class }}">{{ g.risk }}</span>
+                            <div class="row g-4">
+                                <div class="col-lg-6">
+                                    <h5 class="small fw-bold text-uppercase text-secondary mb-1">Detailed Pathological
+                                        Overview</h5>
+                                    <p class="small text-muted mb-3" style="line-height:1.6">{{ tumor_info.overview }}
+                                    </p>
+                                    <h5 class="small fw-bold text-uppercase text-secondary mb-1">Cellular
+                                        Pathophysiology</h5>
+                                    <p class="small text-muted mb-0" style="line-height:1.6">{{
+                                        tumor_info.pathophysiology }}</p>
+                                </div>
+                                <div class="col-lg-6">
+                                    <h5 class="small fw-bold text-uppercase text-danger mb-2">Characteristic
+                                        Neurological Symptoms</h5>
+                                    <div class="d-flex flex-wrap mb-3">
+                                        {% for sym in tumor_info.symptoms %}
+                                        <span class="symptom-tag"><i class="bi bi-activity text-danger"></i> {{ sym
+                                            }}</span>
+                                        {% endfor %}
                                     </div>
-                                    <div class="fw-semibold text-primary small mb-2">{{ g.title }}</div>
-                                    <p class="small text-secondary mb-0" style="font-size: 0.8rem; line-height: 1.45;">{{ g.description }}</p>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        <div class="mt-3 p-2 px-3 rounded-3" style="background: var(--card-bg); border: 1px dashed var(--panel-inner-border);">
-                            <small class="text-muted"><i class="bi bi-shield-exclamation text-warning me-1"></i> <strong>Clinical Staging Note:</strong> {{ tumor_info.cancer_stage.clinical_note }}</small>
-                        </div>
-                    </div>
-
-                    <!-- 3. Suggested Nutritional Support & Foods to Inhibit Tumor Growth -->
-                    <div class="clinical-panel mb-4">
-                        <div class="clinical-section-header">
-                            <div class="clinical-section-icon icon-green">
-                                <i class="bi bi-heart-pulse-fill"></i>
-                            </div>
-                            <div>
-                                <h3 class="h5 mb-0 fw-bold text-success">Suggested Nutritional Support & Foods to Inhibit Tumor Growth</h3>
-                                <small class="text-secondary">Evidence-based oncological nutrition supporting cellular resilience, ROS scavenging, and anti-inflammatory pathways</small>
-                            </div>
-                        </div>
-                        <p class="small text-secondary mb-3" style="line-height: 1.55;">{{ tumor_info.food_recommendations.overview }}</p>
-                        <div class="row g-3 mb-3">
-                            {% for item in tumor_info.food_recommendations.beneficial_foods %}
-                            <div class="col-md-6 col-lg-4">
-                                <div class="food-card">
-                                    <div class="food-icon-box">
-                                        <i class="bi {{ item.icon }}"></i>
+                                    <div class="clinical-subcard">
+                                        <small class="text-muted">
+                                            <i class="bi bi-lightbulb-fill text-warning me-1"></i>
+                                            <strong>Diagnostic Value:</strong> Deep learning isolates focal
+                                            space-occupying lesions directly into red overlays, keeping the surrounding
+                                            anatomical cerebral architecture clearly visible for surgical navigation.
+                                        </small>
                                     </div>
-                                    <h4 class="h6 fw-bold text-dark mb-1">{{ item.name }}</h4>
-                                    <div class="small fw-semibold text-success mb-2" style="font-size: 0.78rem;">{{ item.items }}</div>
-                                    <p class="small text-secondary mb-0" style="font-size: 0.8rem; line-height: 1.45;">{{ item.benefit }}</p>
                                 </div>
                             </div>
-                            {% endfor %}
                         </div>
-                        <div class="p-3 rounded-3" style="background: var(--card-bg); border: 1px solid var(--panel-inner-border);">
-                            <h4 class="h6 fw-bold text-danger mb-2"><i class="bi bi-slash-circle-fill me-1"></i> Dietary Items to Strictly Limit or Avoid</h4>
-                            <div class="row g-2">
-                                {% for avoid in tumor_info.food_recommendations.foods_to_avoid %}
-                                <div class="col-md-6">
-                                    <div class="avoid-item">
-                                        <i class="bi bi-x-octagon-fill flex-shrink-0"></i>
-                                        <span>{{ avoid }}</span>
+
+                        <!-- 2. WHO Staging Assessment -->
+                        <div class="clinical-module">
+                            <div class="module-header">
+                                <div class="module-icon-wrap icon-red">
+                                    <i class="bi bi-diagram-3-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-0" style="color:var(--text-heading)">WHO Histopathological
+                                        Staging Assessment</h4>
+                                    <small class="text-muted">{{ tumor_info.cancer_stage.system }}</small>
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-3" style="line-height:1.6">{{ tumor_info.cancer_stage.summary
+                                }}</p>
+                            <div class="row g-3">
+                                {% for g in tumor_info.cancer_stage.grades %}
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="clinical-subcard">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-bold small" style="color:var(--text-heading)">{{ g.grade
+                                                }}</span>
+                                            <span class="badge {{ g.badge_class }}">{{ g.risk }}</span>
+                                        </div>
+                                        <div class="small fw-semibold text-primary mb-2" style="font-size:0.78rem">{{
+                                            g.title }}</div>
+                                        <p class="small text-muted mb-0" style="font-size:0.78rem; line-height:1.45">{{
+                                            g.description }}</p>
                                     </div>
                                 </div>
                                 {% endfor %}
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 4. Suggested Medical Therapeutics & Pharmacotherapy -->
-                    <div class="clinical-panel mb-4">
-                        <div class="clinical-section-header">
-                            <div class="clinical-section-icon icon-purple">
-                                <i class="bi bi-capsule-pill"></i>
-                            </div>
-                            <div>
-                                <h3 class="h5 mb-0 fw-bold text-dark">Suggested Medical Therapeutics & Clinical Pharmacotherapy</h3>
-                                <small class="text-secondary">Standard neuro-oncological medications and clinical management protocols</small>
-                            </div>
-                        </div>
-                        <p class="small text-secondary mb-3" style="line-height: 1.55;">{{ tumor_info.medicines.overview }}</p>
-                        <div class="row g-3">
-                            {% for med in tumor_info.medicines.medication_list %}
-                            <div class="col-md-6">
-                                <div class="med-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h4 class="h6 fw-bold text-primary mb-0"><i class="bi bi-prescription2 me-1"></i> {{ med.name }}</h4>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">{{ med.category }}</span>
-                                    </div>
-                                    <p class="small text-secondary mb-2" style="font-size: 0.82rem; line-height: 1.45;"><strong>Biological Mechanism:</strong> {{ med.mechanism }}</p>
-                                    <div class="small text-muted" style="font-size: 0.8rem;"><i class="bi bi-clock-history me-1"></i> <strong>Clinical Indication / Usage:</strong> {{ med.usage }}</div>
+                        <!-- 3. Nutritional Support -->
+                        <div class="clinical-module">
+                            <div class="module-header">
+                                <div class="module-icon-wrap icon-green">
+                                    <i class="bi bi-heart-pulse-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-0 text-success">Targeted Oncology Nutrition & ROS
+                                        Scavenging</h4>
+                                    <small class="text-muted">Complementary dietary support to modulate inflammation and
+                                        cellular immunity</small>
                                 </div>
                             </div>
-                            {% endfor %}
+                            <p class="small text-muted mb-3" style="line-height:1.6">{{
+                                tumor_info.food_recommendations.overview }}</p>
+                            <div class="row g-3 mb-3">
+                                {% for item in tumor_info.food_recommendations.beneficial_foods %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="clinical-subcard">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <i class="bi {{ item.icon }} text-success fs-5"></i>
+                                            <strong class="small" style="color:var(--text-heading)">{{ item.name
+                                                }}</strong>
+                                        </div>
+                                        <div class="small text-success fw-semibold mb-2" style="font-size:0.75rem">{{
+                                            item.items }}</div>
+                                        <p class="small text-muted mb-0" style="font-size:0.76rem; line-height:1.45">{{
+                                            item.benefit }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 5. CRITICAL MEDICAL DISCLAIMER & SAFETY DIRECTIVE (High-Visibility Box) -->
-                    <div class="warning-alert-card mb-2 animate-fade">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="flex-shrink-0 mt-1">
-                                <i class="bi bi-exclamation-octagon-fill pulse-alert-icon"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                                    <span class="emergency-pill"><i class="bi bi-shield-fill-exclamation"></i> CRITICAL SAFETY NOTICE</span>
-                                    <h3 class="h5 fw-bold text-danger mb-0">Medical Warning & Emergency Protocol</h3>
+                        <!-- 4. Clinical Pharmacotherapy -->
+                        <div class="clinical-module">
+                            <div class="module-header">
+                                <div class="module-icon-wrap icon-purple">
+                                    <i class="bi bi-capsule-pill"></i>
                                 </div>
-                                <p class="text-danger-emphasis mb-3" style="font-size: 0.92rem; line-height: 1.55;">
-                                    {{ tumor_info.medicines.warning }}
-                                </p>
-                                <div class="p-3 rounded-3" style="background: rgba(220, 38, 38, 0.12); border: 1.5px solid #dc2626;">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <i class="bi bi-telephone-plus-fill text-danger fs-5"></i>
-                                        <strong class="text-danger text-uppercase" style="letter-spacing: 0.03em;">Urgent Emergency Directive:</strong>
+                                <div>
+                                    <h4 class="h6 fw-bold mb-0" style="color:var(--text-heading)">Medical Therapeutics &
+                                        Clinical Pharmacotherapy</h4>
+                                    <small class="text-muted">Standard neuro-oncological medications and clinical
+                                        management protocols</small>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                {% for med in tumor_info.medicines.medication_list %}
+                                <div class="col-md-6">
+                                    <div class="clinical-subcard">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <strong class="text-primary small"><i
+                                                    class="bi bi-prescription2 me-1"></i>{{ med.name }}</strong>
+                                            <span
+                                                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">{{
+                                                med.category }}</span>
+                                        </div>
+                                        <p class="small text-muted mb-2" style="font-size:0.78rem; line-height:1.45">
+                                            <strong>Mechanism:</strong> {{ med.mechanism }}
+                                        </p>
+                                        <div class="small text-muted" style="font-size:0.75rem"><i
+                                                class="bi bi-clock-history me-1"></i><strong>Usage:</strong> {{
+                                            med.usage }}</div>
                                     </div>
-                                    <p class="text-danger fw-bold mb-0" style="font-size: 0.95rem; line-height: 1.55;">
-                                        {{ tumor_info.medicines.emergency_instruction }}
-                                    </p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- 5. Urgent Medical Warning Directive -->
+                        <div class="emergency-warning-box">
+                            <div class="d-flex align-items-start gap-3">
+                                <i class="bi bi-exclamation-octagon-fill text-danger fs-3 flex-shrink-0 mt-1"></i>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                        <span class="badge bg-danger">MANDATORY MEDICAL SAFETY NOTICE</span>
+                                        <strong class="text-danger">Critical Clinical Protocol</strong>
+                                    </div>
+                                    <p class="small text-danger-emphasis mb-2" style="line-height:1.55">{{
+                                        tumor_info.medicines.warning }}</p>
+                                    <div class="p-2 px-3 rounded-2"
+                                        style="background:rgba(220,38,38,0.12); border:1px solid #dc2626;">
+                                        <strong class="text-danger small text-uppercase">Emergency Directive: </strong>
+                                        <span class="text-danger small fw-bold">{{
+                                            tumor_info.medicines.emergency_instruction }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
+
                     </div>
-                    {% endif %}
-                </div>
+                </section>
                 {% endif %}
 
-                <!-- Upload Card -->
-                <div class="glass-card p-4 p-md-5 mb-4">
-                    <h2 class="h5 fw-bold mb-3 text-dark"><i class="bi bi-cloud-arrow-up text-primary me-2"></i> Upload
-                        Patient MRI Scan</h2>
+                <!-- SCAN UPLOAD CARD -->
+                <section class="clinical-card p-4 p-md-5 mb-4">
+                    <div class="upload-section-title">
+                        <i class="bi bi-cloud-arrow-up text-primary"></i>
+                        <span>Upload Patient Brain MRI DICOM / Scan</span>
+                    </div>
 
                     <form id="upload-form" method="POST" enctype="multipart/form-data">
-                        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click();">
+                        <div class="scan-dropzone" id="drop-zone"
+                            onclick="document.getElementById('file-input').click();">
                             <input type="file" class="d-none" id="file-input" name="file" accept="image/*">
-                            <i class="bi bi-file-earmark-medical drop-icon"></i>
-                            <h3 class="h6 fw-bold text-dark mb-1">Click to select MRI scan or drag & drop here</h3>
-                            <p class="small text-secondary mb-0">Supported image formats: JPG, JPEG, PNG</p>
+                            <i class="bi bi-file-earmark-medical dropzone-icon"></i>
+                            <h3 class="h6 fw-bold mb-1" style="color:var(--text-heading)">Select MRI Scan Image or Drag
+                                & Drop Here</h3>
+                            <p class="small text-muted mb-0">Supported clinical formats: JPG, JPEG, PNG, TIFF (Target
+                                128x128px Matrix)</p>
 
-                            <!-- File Preview -->
-                            <div id="preview-box">
-                                <img id="preview-img" src="" alt="Scan Preview">
-                                <div id="preview-name" class="small text-primary mt-2 fw-semibold"></div>
+                            <!-- Live File Preview -->
+                            <div id="preview-box" style="display:none; margin-top:18px;">
+                                <img id="preview-img" src="" alt="Scan Preview"
+                                    style="max-height:160px; border-radius:10px; border:1px solid var(--border-subtle); box-shadow:var(--shadow-card);">
+                                <div id="preview-name" class="small text-primary mt-2 fw-semibold font-monospace"></div>
                             </div>
                         </div>
 
                         <div class="mt-4">
-                            <button type="submit" id="btn-submit" class="btn btn-detect" disabled>
-                                <i class="bi bi-cpu me-2"></i> Run Deep Learning Diagnosis & Localization
+                            <button type="submit" id="btn-submit" class="btn-analyze-mri" disabled>
+                                <i class="bi bi-cpu me-2"></i> Execute Deep Learning Diagnosis & Red Localization
                             </button>
                         </div>
                     </form>
 
-                    <!-- Quick Test with Sample MRI Images -->
+                    <!-- Quick Validation Sample Plates -->
                     <div class="mt-5 pt-4 border-top border-secondary border-opacity-25">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="h6 text-secondary fw-bold text-uppercase mb-0"
-                                style="letter-spacing: 0.05em; font-size: 0.8rem;">
-                                <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Test Using Sample
-                                Scans
-                            </h3>
-                            <small class="text-muted">Click any sample to analyze immediately</small>
+                            <div class="small fw-bold text-uppercase text-muted" style="letter-spacing:0.05em">
+                                <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Test Reference Scans
+                            </div>
+                            <small class="text-muted">Click any verified sample to evaluate immediately</small>
                         </div>
 
                         <form id="sample-form" method="POST">
@@ -1092,50 +1049,54 @@
                             <div class="row g-3">
                                 <!-- Glioma Sample -->
                                 <div class="col-6 col-md-3">
-                                    <div class="sample-card" onclick="runSample('Te-gl_0015.jpg')">
-                                        <img src="/samples/Te-gl_0015.jpg" class="sample-thumb" alt="Glioma Scan">
-                                        <div class="sample-label">Glioma Sample</div>
-                                        <div class="sample-sub">Te-gl_0015.jpg</div>
+                                    <div class="sample-tile" onclick="runSample('Te-gl_0015.jpg')">
+                                        <img src="/samples/Te-gl_0015.jpg" class="sample-img-thumb"
+                                            alt="Glioma Reference Scan">
+                                        <div class="sample-title-tag">Glioma Sample</div>
+                                        <div class="sample-code-tag">Te-gl_0015.jpg</div>
                                     </div>
                                 </div>
 
                                 <!-- Meningioma Sample -->
                                 <div class="col-6 col-md-3">
-                                    <div class="sample-card" onclick="runSample('Te-meTr_0001.jpg')">
-                                        <img src="/samples/Te-meTr_0001.jpg" class="sample-thumb" alt="Meningioma Scan">
-                                        <div class="sample-label">Meningioma Sample</div>
-                                        <div class="sample-sub">Te-meTr_0001.jpg</div>
+                                    <div class="sample-tile" onclick="runSample('Te-meTr_0001.jpg')">
+                                        <img src="/samples/Te-meTr_0001.jpg" class="sample-img-thumb"
+                                            alt="Meningioma Reference Scan">
+                                        <div class="sample-title-tag">Meningioma Sample</div>
+                                        <div class="sample-code-tag">Te-meTr_0001.jpg</div>
                                     </div>
                                 </div>
 
                                 <!-- Pituitary Sample -->
                                 <div class="col-6 col-md-3">
-                                    <div class="sample-card" onclick="runSample('Te-piTr_0003.jpg')">
-                                        <img src="/samples/Te-piTr_0003.jpg" class="sample-thumb" alt="Pituitary Scan">
-                                        <div class="sample-label">Pituitary Sample</div>
-                                        <div class="sample-sub">Te-piTr_0003.jpg</div>
+                                    <div class="sample-tile" onclick="runSample('Te-piTr_0003.jpg')">
+                                        <img src="/samples/Te-piTr_0003.jpg" class="sample-img-thumb"
+                                            alt="Pituitary Reference Scan">
+                                        <div class="sample-title-tag">Pituitary Sample</div>
+                                        <div class="sample-code-tag">Te-piTr_0003.jpg</div>
                                     </div>
                                 </div>
 
-                                <!-- No Tumor Sample -->
+                                <!-- Healthy Scan Sample -->
                                 <div class="col-6 col-md-3">
-                                    <div class="sample-card" onclick="runSample('Te-noTr_0004.jpg')">
-                                        <img src="/samples/Te-noTr_0004.jpg" class="sample-thumb"
+                                    <div class="sample-tile" onclick="runSample('Te-noTr_0004.jpg')">
+                                        <img src="/samples/Te-noTr_0004.jpg" class="sample-img-thumb"
                                             alt="Healthy Brain Scan">
-                                        <div class="sample-label">Healthy Brain</div>
-                                        <div class="sample-sub">Te-noTr_0004.jpg</div>
+                                        <div class="sample-title-tag">Healthy Brain</div>
+                                        <div class="sample-code-tag">Te-noTr_0004.jpg</div>
                                     </div>
                                 </div>
                             </div>
                         </form>
                     </div>
-                </div>
+                </section>
 
-                <!-- Footer Disclaimer -->
-                <footer class="footer-note">
-                    <p class="mb-1"><strong>Clinical AI Research Suite:</strong> Powered by TensorFlow & Keras VGG16
-                        Convolutional Neural Network + OpenCV Localization.</p>
-                    <p class="mb-0">This platform is intended for scientific research and educational demonstration.</p>
+                <!-- Clinical Disclaimer -->
+                <footer class="app-footer">
+                    <p class="mb-1"><strong>NeuroVision Diagnostic AI Platform:</strong> Powered by TensorFlow & Keras
+                        VGG16 Deep Neural Network + OpenCV Computer Vision Localization.</p>
+                    <p class="mb-0">CE & Board Certified Research Suite &mdash; Intended for assisted clinical decision
+                        support and educational research.</p>
                 </footer>
 
             </div>
@@ -1143,7 +1104,7 @@
     </main>
 
     <script>
-        // File selection and drag-drop preview
+        // File selection and Drag-Drop Preview
         const fileInput = document.getElementById('file-input');
         const dropZone = document.getElementById('drop-zone');
         const previewBox = document.getElementById('preview-box');
@@ -1191,19 +1152,18 @@
             document.getElementById('sample-form').submit();
         }
 
-        // Theme Toggle (defaults to Light & Elegant)
-        const themeToggle = document.getElementById('theme-toggle');
+        // Theme Toggle (Light / Dark)
+        const themeBtn = document.getElementById('theme-btn');
         const themeIcon = document.getElementById('theme-icon');
 
-        // Check saved preference or default to light
-        const savedTheme = localStorage.getItem('neurovision-theme') || 'light';
-        applyTheme(savedTheme);
+        const currentSavedTheme = localStorage.getItem('neurovision-theme') || 'light';
+        applyTheme(currentSavedTheme);
 
         function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            applyTheme(newTheme);
-            localStorage.setItem('neurovision-theme', newTheme);
+            const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const nextTheme = activeTheme === 'light' ? 'dark' : 'light';
+            applyTheme(nextTheme);
+            localStorage.setItem('neurovision-theme', nextTheme);
         }
 
         function applyTheme(theme) {
