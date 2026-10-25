@@ -1,8 +1,14 @@
-from flask import Flask, render_template, request, send_from_directory, send_file
-from tensorflow.keras.models import load_model
-from keras.preprocessing.image import load_img, img_to_array
-import numpy as np
 import os
+# Minimize TensorFlow and OpenMP memory allocations on cloud free-tier (512MB RAM)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['TF_NUM_INTRAOP_THREADS'] = '1'
+os.environ['TF_NUM_INTEROP_THREADS'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+from flask import Flask, render_template, request, send_from_directory, send_file
+import numpy as np
 import cv2
 import datetime
 from reportlab.lib.pagesizes import letter
@@ -65,13 +71,22 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates') if os.path.exists(os.path.jo
 # Initialize Flask app
 app = Flask(__name__, template_folder=TEMPLATES_DIR)
 
-# Load the trained model
-MODEL_PATH = os.path.join(BASE_DIR, 'models', 'model.h5')
-if os.path.exists(MODEL_PATH):
-    model = load_model(MODEL_PATH)
-    print(f"Loaded trained model from {MODEL_PATH}")
-else:
-    raise FileNotFoundError(f"Model file not found at {MODEL_PATH}. Please ensure models/model.h5 exists.")
+# Global model holder with lazy loading
+_model = None
+
+def get_model():
+    """Lazy-load model only on first prediction to allow instant web server boot & save RAM."""
+    global _model
+    if _model is None:
+        from tensorflow.keras.models import load_model
+        model_path = os.path.join(BASE_DIR, 'models', 'model.h5')
+        if os.path.exists(model_path):
+            print(f"Loading trained neural model from {model_path}...")
+            _model = load_model(model_path, compile=False)
+            print("Model loaded successfully into memory.")
+        else:
+            raise FileNotFoundError(f"Model file not found at {model_path}.")
+    return _model
 
 # Class labels
 class_labels = ['pituitary', 'glioma', 'notumor', 'meningioma']
@@ -1133,11 +1148,16 @@ def generate_pdf_report(original_img_path, highlighted_img_path, pred_data, file
 # ==============================================================================
 def predict_tumor(image_path):
     IMAGE_SIZE = 128
-    img = load_img(image_path, target_size=(IMAGE_SIZE, IMAGE_SIZE))
-    img_array = img_to_array(img) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
+    # Use cv2 for image loading and preprocessing (saves ~150MB overhead compared to PIL/keras)
+    bgr_img = cv2.imread(image_path)
+    if bgr_img is None:
+        raise ValueError(f"Could not read image file at {image_path}")
+    rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+    resized_img = cv2.resize(rgb_img, (IMAGE_SIZE, IMAGE_SIZE))
+    img_array = np.expand_dims(resized_img.astype(np.float32) / 255.0, axis=0)
 
-    predictions = model.predict(img_array, verbose=0)
+    active_model = get_model()
+    predictions = active_model.predict(img_array, verbose=0)
     predicted_class_index = int(np.argmax(predictions, axis=1)[0])
     confidence_score = float(np.max(predictions, axis=1)[0])
     predicted_label = class_labels[predicted_class_index]
